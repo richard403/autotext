@@ -132,7 +132,6 @@ if __name__ == '__main__':
         with open(d_result, 'w') as f:
             f.write(''.join(resultList))
 
-
 # python ./datamanager/dataload.py
 # python ./rnn/train.py --num_epochs=600 --restore --batch_size=50  --mode=train --tensorboard
 # python ./rnn/train.py --test_num 200  --mode=test
