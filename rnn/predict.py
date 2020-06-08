@@ -11,7 +11,7 @@ import argparse
 from utils import configParse
 
 
-def predict(world, keyDict, model, temperature=1.0):
+def predict(world, keyDict, model, temperature=1.0, num=100):
     baseWorlds = set(keyDict.keys())
     diff = list(set(world) - baseWorlds)
     diff.sort()
@@ -38,7 +38,7 @@ def predict(world, keyDict, model, temperature=1.0):
 
     print(world)
     resultList = [world, ]
-    for i in range(10):
+    for i in range(num):
         y_pred = modelPredict(worldIndexList, temperature)
         print(idxDict[y_pred[0]], end='', flush=True)
         resultList.append(idxDict[y_pred[0]])

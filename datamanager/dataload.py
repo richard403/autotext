@@ -5,26 +5,27 @@
 # @author: whx
 
 import tensorflow as tf
-import numpy as np
+from utils import configParse
 import os
 import json
 
 class DataLoader():
-    def __init__(self, dataDir, saveFile, keyFile):
+    def __init__(self, dataDir, saveFile, keyFile=None):
         self.dataDir = dataDir
         self.saveFile = saveFile
+        self.keyFile = keyFile
         self.fileList = ['%s/%s' % (dataDir, fileName) for fileName in os.listdir(self.dataDir)]
         self.keyDict = {}
         self.keys = []
 
-        if keyFile is not None and os.path.isfile(keyFile):
-            with open(keyFile, encoding='utf-8') as f1:
+        if self.keyFile is not None and os.path.isfile(self.keyFile):
+            with open(self.keyFile, encoding='utf-8') as f1:
                 string = f1.read()
                 self.keyDict = json.loads(string)
                 self.keys = list(set(self.keyDict.keys()))
                 self.keys.sort()
 
-    def writeFeature(self, keyFile=None):
+    def writeFeature(self):
         with tf.io.TFRecordWriter(self.saveFile) as writer:
             for _file in self.fileList:
                 rawTxt = open(_file, encoding='utf-8').read().lower()
@@ -42,7 +43,7 @@ class DataLoader():
                 example = tf.train.Example(features=tf.train.Features(feature=feature))
                 writer.write(example.SerializeToString())
 
-        with open(keyFile, 'w') as f2:
+        with open(self.keyFile, 'w') as f2:
             f2.write(json.dumps(self.keyDict , ensure_ascii=False).encode('utf-8').decode('utf-8'))
 
 
@@ -72,12 +73,14 @@ class DataLoader():
 
 
 if __name__ == '__main__':
-    dataDir = '/home/whx/workspace/work/python_code/autotext/data/train'
-    saveFile = '/home/whx/workspace/work/python_code/autotext/data/train.tfrecord'
-    keyFile = '/home/whx/workspace/work/python_code/autotext/data/key.json'
-    # dataLoader = DataLoader(dataDir, saveFile)
-    # dataLoader.writeFeature(keyFile)
-    DataLoader.readFeature(saveFile, 3)
+    d_confDict = configParse.ConfigParser.getConf2Dict('RNN')
+    d_trainDir = d_confDict['train_data']
+    d_tfRecordFile = d_confDict['tfrecord_file']
+    d_svModelFile = d_confDict['sv_model_dir']
+    d_keyFile = d_confDict['key_file']
+    dataLoader = DataLoader(d_trainDir, d_tfRecordFile, d_keyFile)
+    dataLoader.writeFeature()
+    # DataLoader.readFeature(saveFile, 3)
     # [14  2  9  0 11  5  3 10  7  4 13 12  6  1  8  6]
 
 

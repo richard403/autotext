@@ -52,7 +52,7 @@ def restoredFromCK(numChars):
 def train(dataLoader, model, numBatches, seqLen, batchSize, saveModelFile=None):
     learningRate = 1e-3
     optimizer = tf.keras.optimizers.Adam(learning_rate=learningRate)
-    ds = dataLoader.readFeature(d_tfRecordFile, seqLen).repeat(numBatches).shuffle(buffer_size=4).\
+    ds = dataLoader.readFeature(d_tfRecordFile, seqLen).repeat(numBatches).shuffle(buffer_size=batchSize * 11).\
         batch(batchSize).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
     checkpoint = tf.train.Checkpoint(myModel=model)
@@ -93,11 +93,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--mode', default='train', help='train or test')
     parser.add_argument('--ck_num', default=100)
+    parser.add_argument('--test_num', default=100)
     parser.add_argument('--restore', help="是否从ck中恢复", action="store_true")
     parser.add_argument('--tensorboard', action="store_true")
     parser.add_argument('--num_epochs', default=1)
     parser.add_argument('--batch_size', default=3)
-    parser.add_argument('--learning_rate', default=0.001)
     parser.add_argument('--temperature', default=1.0)
     parser.add_argument('--load_flag')
     args = parser.parse_args()
@@ -128,12 +128,13 @@ if __name__ == '__main__':
         train(dataLoader, model, int(args.num_epochs), SEQ_LEN, int(args.batch_size), d_svModelFile)
 
     if args.mode == 'test':
-        resultList = predict.predict("中国共", dataLoader.keyDict, model, float(args.temperature))
+        resultList = predict.predict("wiki百科", dataLoader.keyDict, model, float(args.temperature), int(args.test_num))
         with open(d_result, 'w') as f:
             f.write(''.join(resultList))
 
 
-
-
+# python ./datamanager/dataload.py
+# python ./rnn/train.py --num_epochs=600 --restore --batch_size=50  --mode=train --tensorboard
+# python ./rnn/train.py --test_num 200  --mode=test
 
 

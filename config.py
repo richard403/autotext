@@ -8,7 +8,7 @@ import os
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 CONF_PATH = os.path.join(ROOT_PATH, 'conf.d')
 
-SEQ_LEN = 3
+SEQ_LEN = 5
 
 
 
