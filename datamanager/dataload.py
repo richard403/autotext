@@ -10,42 +10,40 @@ import os
 import json
 
 class DataLoader():
-    def __init__(self, dataDir, saveFile):
+    def __init__(self, dataDir, saveFile, keyFile):
         self.dataDir = dataDir
         self.saveFile = saveFile
         self.fileList = ['%s/%s' % (dataDir, fileName) for fileName in os.listdir(self.dataDir)]
+        self.keyDict = {}
+        self.keys = []
 
-
-    def writeFeature(self, keyFile=None):
-        keyDict = {}
-        keys = list()
         if keyFile is not None and os.path.isfile(keyFile):
             with open(keyFile, encoding='utf-8') as f1:
                 string = f1.read()
-                keyDict = json.loads(string)
-                keys = list(set(keyDict.keys()))
-                keys.sort()
+                self.keyDict = json.loads(string)
+                self.keys = list(set(self.keyDict.keys()))
+                self.keys.sort()
 
+    def writeFeature(self, keyFile=None):
         with tf.io.TFRecordWriter(self.saveFile) as writer:
             for _file in self.fileList:
                 rawTxt = open(_file, encoding='utf-8').read().lower()
 
                 rawSet = set(rawTxt)
-                diffList = list(rawSet - set(keys))
+                diffList = list(rawSet - set(self.keys))
                 diffList.sort()
-                keyLen = len(keyDict)
+                keyLen = len(self.keyDict )
                 for index, _key in enumerate(diffList):
-                    keyDict.update({_key: keyLen + index})
+                    self.keyDict .update({_key: keyLen + index})
 
                 feature = {
-                    'txt': tf.train.Feature(int64_list=tf.train.Int64List(value=[keyDict[_w] for _w in rawTxt])),
-                    'len': tf.train.Feature(int64_list=tf.train.Int64List(value=[len(rawTxt)])),
+                    'txt': tf.train.Feature(int64_list=tf.train.Int64List(value=[self.keyDict [_w] for _w in rawTxt])),
                 }
                 example = tf.train.Example(features=tf.train.Features(feature=feature))
                 writer.write(example.SerializeToString())
 
         with open(keyFile, 'w') as f2:
-            f2.write(json.dumps(keyDict, ensure_ascii=False).encode('utf-8').decode('utf-8'))
+            f2.write(json.dumps(self.keyDict , ensure_ascii=False).encode('utf-8').decode('utf-8'))
 
 
     @staticmethod
@@ -53,7 +51,6 @@ class DataLoader():
         rawDataSet = tf.data.TFRecordDataset(saveFile)
         featureDescription = {
             'txt': tf.io.FixedLenSequenceFeature([], tf.int64, allow_missing=True, default_value=-1),
-            'len': tf.io.FixedLenFeature([], tf.int64, default_value=-1),
         }
 
         def _parseExample(exampleString):
@@ -68,6 +65,7 @@ class DataLoader():
             for i in range(txtLen - seqLen):
                 trainList.append(tf.slice(txt, [i], [seqLen]))
                 labelList.append(tf.gather(txt, i + seqLen))
+
         return tf.data.Dataset.from_tensor_slices((trainList, labelList))
 
 
