@@ -9,7 +9,7 @@ import shutil
 
 # op: 0 不创建，1 没有则创建，2 先删除再创建
 def getDir(tagDir, op=0):
-    if op == 1:
+    if op == 1 and not os.path.isdir(tagDir):
         os.makedirs(tagDir)
         return tagDir
     elif op == 2:

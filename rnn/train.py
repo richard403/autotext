@@ -105,7 +105,7 @@ if __name__ == '__main__':
     d_keyFile = d_confDict['key_file']
     d_result = d_confDict['result_txt']
     d_ckNum = int(args.ck_num)
-    d_ckDir = fileUtil.getDir(d_confDict['ck_dir'], op=2)
+    d_ckDir = fileUtil.getDir(d_confDict['ck_dir'], op=1)
     d_tensorboard = args.tensorboard
     d_boradPath = d_confDict['tensorboard_path']
     dataLoader = dataload.DataLoader(d_trainDir, d_tfRecordFile, d_keyFile)
