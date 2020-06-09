@@ -7,7 +7,7 @@ export PYTHONPATH="/home/whx/workspace/work/python_code/autotext:{$PYTHONPATH}"
 
 ### 开启可视化
 ```angular2
-tensorboard --logdir=./data/tensorboard/rnn/20200609_11
+tensorboard --logdir=./data/tensorboard/rnn/20200609_11 --bind_all
 ```
 
 ### 训练文件转成TFRecord
