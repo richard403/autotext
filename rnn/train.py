@@ -24,7 +24,7 @@ _LOG = logger.getLogger('rnn_train')
 def saveModel(model, saveModelDir):
     if saveModelDir is None:
         return
-    tagDir = os.path.join(saveModelDir, dateUtil.getNow(format='%Y%m%d_%H'))
+    tagDir = os.path.join(saveModelDir, dateUtil.getNow(format='%Y%m%d%H'))
     tf.saved_model.save(model, fileUtil.getDir(tagDir, op=2))
 
 
