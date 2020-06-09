@@ -24,10 +24,6 @@ _LOG = logger.getLogger('rnn_train')
 def saveModel(model, saveModelDir):
     if saveModelDir is None:
         return
-    if not os.path.isdir(saveModelDir):
-        _LOG.error("保存模型目录：%s 不存在" % saveModelDir)
-        return
-
     tagDir = os.path.join(saveModelDir, dateUtil.getNow(format='%Y%m%d_%H'))
     tf.saved_model.save(model, fileUtil.getDir(tagDir, op=2))
 
