@@ -21,11 +21,15 @@ from rnn import predict
 
 _LOG = logger.getLogger('rnn_train')
 
-def saveModel(model, saveModelDir):
+def saveModel(model, saveModelDir, signatures=None):
     if saveModelDir is None:
         return
     tagDir = os.path.join(saveModelDir, dateUtil.getNow(format='%Y%m%d%H'))
-    tf.saved_model.save(model, fileUtil.getDir(tagDir, op=2))
+    tagDir = fileUtil.getDir(tagDir, op=2)
+    if type(signatures) == dict:
+        tf.saved_model.save(model, tagDir, signatures)
+    else:
+        tf.saved_model.save(model, tagDir)
 
 
 def loadModel(loadModelDir, flag):
@@ -80,7 +84,7 @@ def train(dataLoader, model, numBatches, seqLen, batchSize, saveModelFile=None):
 
     path = manager.save(checkpoint_number=batchIndex)
     _LOG.info("model saved to %s" % path)
-    saveModel(model, saveModelFile)
+    saveModel(model, saveModelFile, {"call": model.call, "predict": model.predict})
     # with summary_writer.as_default():
     #     tf.summary.trace_export(name="model_trace", step=0, profiler_outdir=d_confDict['tensorboard_path'])  # 保存Trace信息到文件（可选）
 
@@ -126,6 +130,9 @@ if __name__ == '__main__':
 
     if args.mode == 'train':
         train(dataLoader, model, int(args.num_epochs), SEQ_LEN, int(args.batch_size), d_svModelFile)
+        # train(dataLoader, model, int(args.num_epochs), SEQ_LEN, int(args.batch_size), None)
+        # resultList = predict.predict("Wiki软件由软件设计模", dataLoader.keyDict, model, float(args.temperature),
+        #                              int(args.test_num))
 
     if args.mode == 'test':
         resultList = predict.predict("Wiki软件由软件设计模", dataLoader.keyDict, model, float(args.temperature), int(args.test_num))

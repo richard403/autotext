@@ -26,20 +26,22 @@ def predict(world, keyDict, model, temperature=1.0, num=100):
         idxDict[v] = k
     print(worldIndexList)
 
-    def modelPredict(inputs, temperature=1.):
-        batch_size, _ = tf.shape(inputs)
-        logits = model.call(inputs, from_logits=True)
-        prob = tf.nn.softmax(logits / temperature).numpy()
-        # out = np.array([np.random.choice(baseLen, p=prob[i, :])
-        #                  for i in range(batch_size.numpy())])
-        out = np.array([tf.argmax(prob[i, :]) for i in range(batch_size.numpy())])
-
-        return out
+    # def modelPredict(inputs, temperature=1.):
+    #     batch_size, _ = tf.shape(inputs)
+    #     logits = model.call(inputs, from_logits=True)
+    #     prob = tf.nn.softmax(logits / temperature).numpy()
+    #     # out = np.array([np.random.choice(baseLen, p=prob[i, :])
+    #     #                  for i in range(batch_size.numpy())])
+    #     out = np.array([tf.argmax(prob[i, :]) for i in range(batch_size.numpy())])
+    #
+    #     return out
 
     print(world)
     resultList = [world, ]
     for i in range(num):
-        y_pred = modelPredict(worldIndexList, temperature)
+        # y_pred = modelPredict(worldIndexList, temperature)
+        y_pred = model.predict(worldIndexList, temperature).numpy()
+        # print(y_pred)
         print(idxDict[y_pred[0]], end='', flush=True)
         resultList.append(idxDict[y_pred[0]])
         worldIndexList = np.concatenate([worldIndexList[:, 1:], np.expand_dims(y_pred, axis=1)], axis=1)
