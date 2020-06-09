@@ -32,7 +32,6 @@ class RNN(tf.keras.Model):
             return logits
         else:
             return tf.nn.softmax(logits)
-
     def predict(self, inputs, temperature=1.):
         batch_size, _ = tf.shape(inputs)
         logits = self(inputs, from_logits=True)

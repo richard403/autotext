@@ -5,9 +5,18 @@
 # @author: whx
 
 import os
+import shutil
 
-def getDir(tagDir, create=False):
-    if os.path.isdir(tagDir):
+# op: 0 不创建，1 没有则创建，2 先删除再创建
+def getDir(tagDir, op=0):
+    if op == 1:
+        os.makedirs(tagDir)
         return tagDir
-    os.makedirs(tagDir)
-    return tagDir
+    elif op == 2:
+        if os.path.isdir(tagDir):
+            shutil.rmtree(tagDir)
+        os.makedirs(tagDir)
+        return tagDir
+    else:
+        return tagDir if os.path.isdir(tagDir) else None
+

@@ -29,7 +29,7 @@ def saveModel(model, saveModelDir):
         return
 
     tagDir = os.path.join(saveModelDir, dateUtil.getNow(format='%Y%m%d_%H'))
-    tf.saved_model.save(model, fileUtil.getDir(tagDir, create=True))
+    tf.saved_model.save(model, fileUtil.getDir(tagDir, op=2))
 
 
 def loadModel(loadModelDir, flag):
@@ -109,31 +109,35 @@ if __name__ == '__main__':
     d_keyFile = d_confDict['key_file']
     d_result = d_confDict['result_txt']
     d_ckNum = int(args.ck_num)
-    d_ckDir = os.path.join(d_confDict['ck_dir'], 'rnn')
+    d_ckDir = fileUtil.getDir(d_confDict['ck_dir'], op=2)
     d_tensorboard = args.tensorboard
-
+    d_boradPath = d_confDict['tensorboard_path']
     dataLoader = dataload.DataLoader(d_trainDir, d_tfRecordFile, d_keyFile)
 
     if d_tensorboard:
-        summary_writer = tf.summary.create_file_writer(d_confDict['tensorboard_path'])
+        summary_writer = tf.summary.create_file_writer(
+            fileUtil.getDir(os.path.join(d_boradPath, dateUtil.getNow(format='%Y%m%d_%H')), op=2)
+        )
 
     if args.load_flag is not None:
-        loadModel(d_svModelFile, args.load_flag)
+        model = loadModel(d_svModelFile, args.load_flag)
     elif args.restore:
         model = restoredFromCK(len(dataLoader.keyDict))
     else:
         model = RNN(numChars=len(dataLoader.keyDict))
+    # model = loadModel(d_svModelFile, "20200608_17")
+    # resultList = predict.predict("Wiki软件由", dataLoader.keyDict, model, float(args.temperature), int(args.test_num))
 
     if args.mode == 'train':
         train(dataLoader, model, int(args.num_epochs), SEQ_LEN, int(args.batch_size), d_svModelFile)
 
     if args.mode == 'test':
-        resultList = predict.predict("wiki百科", dataLoader.keyDict, model, float(args.temperature), int(args.test_num))
+        resultList = predict.predict("Wiki软件由软件设计模", dataLoader.keyDict, model, float(args.temperature), int(args.test_num))
         with open(d_result, 'w') as f:
             f.write(''.join(resultList))
 
 # python ./datamanager/dataload.py
 # python ./rnn/train.py --num_epochs=600 --restore --batch_size=50  --mode=train --tensorboard
-# python ./rnn/train.py --test_num 200  --mode=test
+# python ./rnn/train.py --test_num 200 --load_flag 20200608_17   --mode=test
 
 

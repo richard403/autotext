@@ -44,6 +44,7 @@ def predict(world, keyDict, model, temperature=1.0, num=100):
         resultList.append(idxDict[y_pred[0]])
         worldIndexList = np.concatenate([worldIndexList[:, 1:], np.expand_dims(y_pred, axis=1)], axis=1)
 
+    print('\n')
     return resultList
 
 if __name__ == '__main__':
