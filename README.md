@@ -37,5 +37,6 @@ EL_NAME=rnn -t tensorflow/serving
 curl -d '{"signature_name": "call", "inputs":{"inputs":[[ 23,  22, 366,  65, 291,366, 65, 357, 349, 261]], "from_logits":true}}' -X POST  "http://127.0.0.1:8501/v1/models/rnn:predict"
 curl -d '{"signature_name": "predict", "inputs":{"worlds":[[ 23,  22, 366,  65, 291,366, 65, 357, 349, 261]], "temperature":1.0}}' -X POST  "http://127.0.0.1:8501/v1/models/rnn:predict"
 ```
+11
 
 
